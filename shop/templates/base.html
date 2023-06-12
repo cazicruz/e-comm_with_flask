@@ -1,0 +1,51 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}market.com{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alkatra&display=swap" rel="stylesheet">
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
+<!-- main css  -->
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% endblock %}
+
+{% block navbar %}
+<nav>
+    <div class="logo">
+        <h4><a href="{{ url_for('home') }}">Marvel-Clinic</a></h4>
+    </div>
+    <ul class="nav-links">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('product') }}">Product</a></li>
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+        <li><a href="{{ url_for('signUp') }}">Sign-up</a></li>
+    </ul>
+   
+</nav>
+{% endblock %}
+
+{% block content %}
+<div>
+    {% block page_content %}{% endblock %}
+</div>
+<p>The local date and time is {{ moment(current_time).format('LLL') }}.</p>
+<p>That was {{ moment(current_time).fromNow(refresh=True) }}</p>
+
+
+{% block scripts %}
+{{ super() }}
+{{ moment.include_moment() }}
+{% endblock %}
+
+<footer class="text-center background-color=black">
+    <div class="container">
+        <hr>
+        <p>2023 Marvel-Clinic Copyright &#169;</p>
+    </div>
+</footer>
+{% endblock %}

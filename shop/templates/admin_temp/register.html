@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="container form-container">
+  <p><strong>Create your <i class="bigger_text">Market Place</i> account</strong></p>
+    {% from "_formhelpers.html" import render_field %}
+<form method=post enctype="multipart/form-data" class='form-sign-up'>
+  <dl>
+    {{ render_field(form.fname ,class="form-control") }}
+    {{ render_field(form.lname ,class="form-control") }}
+    {{ render_field(form.username ,class="form-control") }}
+    {{ render_field(form.email ,class="form-control") }}
+    {{ render_field(form.address ,class="form-control") }}
+    {{ render_field(form.password1 ,class="form-control") }}
+    {{ render_field(form.password2 ,class="form-control") }}
+    {{ render_field(form.roleSelection, class="form-control") }}
+    <input type="file" name="photo" class="file-input">
+    
+  </dl>
+  <p><input type=submit value="Sign up" class="btn-info btn mt-2"></p>
+</form>
+</div>
+{% endblock %}

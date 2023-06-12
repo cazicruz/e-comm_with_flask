@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="container">
+    {% from "_formhelpers.html" import render_field %}
+<form method=post enctype="multipart/form-data">
+  <dl>
+    {{ render_field(form.username ) }}
+    {{ render_field(form.password )}}
+  </dl>
+  <p><input type=submit value="Login" class="btn-info btn mt-2"></p>
+</form>
+</div>
+{% endblock %}
