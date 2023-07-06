@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+
+
+
+{% block page_content %}
+
+<div class="container">
+    {% for product in products %}
+    <div class="card">
+        product name: {{product.name}} <br>
+        product price: {{product.price}} <br>
+        product description: {{product.description}} <br>
+        product image: {{product.image}} <br>
+
+        <a href="{{url_for('shop.add_to_cart', product_id=product.id)}}">Add to cart</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

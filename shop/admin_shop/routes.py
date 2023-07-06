@@ -1,25 +1,35 @@
 import os
 from flask import render_template, session, request, redirect, url_for, flash
 from werkzeug.utils import secure_filename
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_user, login_required, current_user, LoginManager, logout_user
 from shop import app, db, bcrypt
 from datetime import datetime
 from .forms import LoginForm, SignUpForm
-from .models import Users, Products
+from .models import Users
 
 @app.shell_context_processor
 def make_shell_context():
- return dict(db=db, Users=Users, products=Products)
+ return dict(db=db, Users=Users)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message_category = 'info'
+
+@login_manager.user_loader
+def load_user(user_id):
+    user = Users.query.get(int(user_id))
+    return user    
 
 
-
-
-@app.route('/')
+#================= home view================
+@app.route('/', endpoint='home')
 def home():
-    user_agent = request.headers.get('User-Agent')
-    return '<p>Your browser is {}</p>'.format(user_agent)
+    return render_template('index.html', current_time=datetime.utcnow(), endpoint=request.endpoint)
 
-@app.route('/sign-up', methods=['GET', 'POST'])
+
+#================ sign-up view=================
+@app.route('/sign-up', methods=['GET', 'POST'], endpoint='signUp')
 def signUp():
     form = SignUpForm(request.form)
 
@@ -42,31 +52,45 @@ def signUp():
         user = Users(fname=request.form.get('fname'), lname=form.lname.data, username=form.username.data, email=form.email.data, password=hash_password,profile_img=path)
         db.session.add(user)
         db.session.commit()
-        #flash('Welcome back')
+        flash('Welcome back', 'success')
         return redirect(url_for('home'))
-    return render_template("admin_temp/register.html", form=form,current_time=datetime.utcnow())
+    return render_template("admin_temp/register.html", form=form,current_time=datetime.utcnow(), endpoint=request.endpoint)
 
-@app.route('/login', methods=['GET', 'POST'] )
+# ===========login view============
+@app.route('/login', methods=['GET', 'POST'], endpoint='login' )
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate_on_submit():
         user = Users.query.filter_by(username=form.username.data).first()
+
         if user and bcrypt.check_password_hash(user.password, form.password.data):
-            session['username'] = user.username
-            session['id'] = user.id
-            flash('Welcome back')
+            login_user(user)
+            flash('user logged in successfully', 'success')
+#=============== if user was redirected by protected route =================
+#=============== access that route after a successful auth =================
+            next_route = request.args.get('next')
+            if next_route:
+               return redirect(next_route) 
+            #====== else go to home route =========           
             return redirect(url_for('home'))
         else:
             flash('Invalid username or password', 'danger')
-            return redirect(url_for('login'))
     
-    return render_template('admin_temp/login.html',form=form, current_time=datetime.utcnow())
+    return render_template('admin_temp/login.html',form=form, current_time=datetime.utcnow(), endpoint=request.endpoint)
 
-@app.route('/product', methods=['GET', 'POST'] )
-def product():
-    return render_template('product.html')
 
-# handles errors 404 and 500 
+
+# =========================logout view======================= 
+@app.route('/logout', methods=['GET', 'POST'])
+@login_required
+def logout():
+   logout_user()
+   flash('user logged out successfully', 'success')
+   return redirect(url_for('login'))
+   
+   
+
+#==================== handles errors 404 and 500================= 
 @app.errorhandler(404)
 def page_not_found(e):
  return "this is a 404 error page", 404

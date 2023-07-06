@@ -28,4 +28,6 @@ bcrypt = Bcrypt(app)
 moment = Moment(app)
 bootstrap = Bootstrap(app)
 
+
 from shop.admin_shop import routes
+from shop.products import routes
